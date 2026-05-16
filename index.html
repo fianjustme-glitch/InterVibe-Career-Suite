@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InterVibe - CV Builder & Interview Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neo-glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .neon-text-blue {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .gradient-bg {
+            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(147, 51, 234, 0.15) 0%, transparent 50%);
+        }
+
+        .cv-preview-container {
+            aspect-ratio: 1 / 1.414; /* A4 Ratio */
+            width: 100%;
+            background: white;
+            color: #334155;
+            padding: 2rem;
+            transform-origin: top center;
+        }
+
+        /* Print Specifics */
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .cv-preview-container {
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        input, textarea {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/5 no-print">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="p-2 bg-blue-600 rounded-lg neo-glow">
+                    <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-2xl font-bold neon-text-blue tracking-tighter">InterVibe</span>
+            </div>
+            <div class="flex space-x-8 text-sm font-medium">
+                <button onclick="window.switchTab('cv')" id="tab-cv" class="tab-active py-1 transition-all">Pembuat CV</button>
+                <button onclick="window.switchTab('interview')" id="tab-interview" class="py-1 text-slate-400 hover:text-white transition-all">Simulasi Interview</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Tab: CV Builder -->
+        <div id="view-cv" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Form Section -->
+            <div class="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
+                <div class="glass p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xl font-bold flex items-center mb-4">
+                        <i data-lucide="user" class="w-5 h-5 mr-2 text-blue-400"></i> Data Pribadi
+                    </h2>
+                    <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nama Lengkap</label>
+                            <input type="text" id="input-name" placeholder="Budi Santoso" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Umur</label>
+                            <input type="number" id="input-age" placeholder="24" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Posisi Target</label>
+                        <input type="text" id="input-position" placeholder="Contoh: Frontend Developer" class="w-full px-4 py-3 rounded-xl text-white">
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xl font-bold flex items-center mb-4">
+                        <i data-lucide="contact" class="w-5 h-5 mr-2 text-emerald-400"></i> Informasi Kontak & Alamat
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Email</label>
+                            <input type="email" id="input-email" placeholder="budi@email.com" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">No. WhatsApp</label>
+                            <input type="text" id="input-phone" placeholder="0812xxxx" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Alamat / Domisili</label>
+                        <input type="text" id="input-address" placeholder="Jakarta, Indonesia" class="w-full px-4 py-3 rounded-xl text-white">
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xl font-bold flex items-center mb-4">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 mr-2 text-yellow-400"></i> Pendidikan Terakhir
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nama Sekolah / Universitas</label>
+                            <input type="text" id="input-education" placeholder="Universitas Indonesia" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Tahun Lulus</label>
+                            <input type="text" id="input-edu-year" placeholder="2023" class="w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xl font-bold flex items-center mb-4">
+                        <i data-lucide="briefcase" class="w-5 h-5 mr-2 text-purple-400"></i> Pengalaman & Organisasi
+                    </h2>
+                    <textarea id="input-experience" rows="4" placeholder="Sebutkan pengalaman kerja atau organisasi kamu..." class="w-full px-4 py-3 rounded-xl text-white resize-none"></textarea>
+                </div>
+
+                <div class="glass p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xl font-bold flex items-center mb-4">
+                        <i data-lucide="code" class="w-5 h-5 mr-2 text-emerald-400"></i> Keahlian (Skills)
+                    </h2>
+                    <input type="text" id="input-skills" placeholder="Contoh: React, Tailwind, Figma, JavaScript" class="w-full px-4 py-3 rounded-xl text-white">
+                </div>
+
+                <div class="flex gap-4 no-print">
+                    <button onclick="window.saveData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center neo-glow">
+                        <i data-lucide="save" class="w-5 h-5 mr-2"></i> Simpan Data
+                    </button>
+                    <button onclick="window.print()" class="flex-1 glass hover:bg-white/10 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center">
+                        <i data-lucide="printer" class="w-5 h-5 mr-2"></i> Cetak CV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="no-print">
+                <div class="sticky top-28 space-y-4">
+                    <div class="flex justify-between items-center px-4">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Live Preview</span>
+                        <div class="flex space-x-1">
+                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 scale-95 origin-top transition-transform hover:scale-[0.98]">
+                        <div id="cv-preview" class="cv-preview-container">
+                            <!-- Header -->
+                            <div class="border-b-2 border-slate-200 pb-6 mb-6 flex justify-between items-end">
+                                <div class="text-left">
+                                    <h1 id="pv-name" class="text-3xl font-bold text-slate-800">Nama Anda</h1>
+                                    <p id="pv-position" class="text-blue-600 font-semibold tracking-wide uppercase text-sm mt-1">POSISI TARGET</p>
+                                </div>
+                                <div class="text-right text-[11px] text-slate-500 font-medium">
+                                    <p id="pv-age-display">Umur: -- Tahun</p>
+                                    <p id="pv-address-display">Domisili: --</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-8">
+                                <!-- Sidebar Info -->
+                                <div class="col-span-1 space-y-6 border-r border-slate-100 pr-4">
+                                    <div>
+                                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest mb-3">Kontak</h3>
+                                        <div class="space-y-2 text-[10px] text-slate-600">
+                                            <p class="flex items-center"><i data-lucide="mail" class="w-3 h-3 mr-2 text-blue-500"></i> <span id="pv-email">email@anda.com</span></p>
+                                            <p class="flex items-center"><i data-lucide="phone" class="w-3 h-3 mr-2 text-blue-500"></i> <span id="pv-phone">0812-xxxx</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest mb-3">Pendidikan</h3>
+                                        <div class="text-[10px] text-slate-600">
+                                            <p id="pv-education" class="font-bold text-slate-700">Nama Sekolah</p>
+                                            <p id="pv-edu-year">Lulusan Tahun ----</p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest mb-3">Keahlian</h3>
+                                        <div id="pv-skills" class="flex flex-wrap gap-1">
+                                            <!-- Skill tags -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Main Info -->
+                                <div class="col-span-2 space-y-6">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-200 pb-1 mb-3">PROFIL PROFESIONAL</h3>
+                                        <p class="text-slate-600 text-[11px] leading-relaxed italic">
+                                            Seorang profesional yang berdedikasi tinggi dan siap berkontribusi dalam tim. Memiliki dasar kuat pada pengerjaan proyek dan kolaborasi secara efisien sesuai bidang keahlian yang ditekuni.
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-200 pb-1 mb-3">PENGALAMAN & ORGANISASI</h3>
+                                        <p id="pv-experience" class="text-slate-600 text-[11px] whitespace-pre-line leading-relaxed">Detail pengalaman Anda akan muncul di sini...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-20 pt-8 border-t border-slate-100 text-center text-[10px] text-slate-400 uppercase tracking-widest">
+                                Generated by InterVibe Professional Career Suite
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Interview Simulation -->
+        <div id="view-interview" class="hidden max-w-2xl mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-500">
+            <div id="interview-welcome" class="glass p-10 rounded-3xl text-center space-y-6">
+                <div class="w-20 h-20 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto neo-glow">
+                    <i data-lucide="headset" class="w-10 h-10 text-blue-400"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold">Siap Menghadapi HRD?</h2>
+                    <p class="text-slate-400 mt-2">Kami akan mensimulasikan interview berdasarkan posisi yang Anda incar.</p>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 inline-block px-10">
+                    <p class="text-sm">Posisi Terdeteksi:</p>
+                    <p id="interview-target-pos" class="text-blue-400 font-bold text-lg">---</p>
+                </div>
+                <button onclick="window.startInterview()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all neo-glow text-lg">
+                    MULAI SIMULASI SEKARANG
+                </button>
+            </div>
+
+            <!-- Chat Interface -->
+            <div id="interview-chat" class="hidden flex flex-col h-[600px] glass rounded-3xl overflow-hidden border border-white/10">
+                <div class="p-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
+                            <i data-lucide="user-round" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">HRD Virtual (InterVibe)</p>
+                            <p class="text-[10px] text-emerald-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1 animate-pulse"></span> Online
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="location.reload()" class="text-slate-400 hover:text-white transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth">
+                    <!-- Messages will appear here -->
+                </div>
+
+                <div id="chat-typing" class="px-6 py-2 hidden">
+                    <div class="flex items-center space-x-2 text-slate-500 italic text-xs">
+                        <span>HRD sedang mengetik</span>
+                        <div class="flex">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chat-input-area" class="p-4 bg-white/5 border-t border-white/5">
+                    <div class="flex space-x-2">
+                        <input type="text" id="user-response" placeholder="Ketik jawaban Anda di sini..." class="flex-1 px-4 py-3 rounded-xl text-sm" onkeypress="window.handleKeyPress(event)">
+                        <button onclick="window.sendResponse()" class="bg-blue-600 p-3 rounded-xl hover:bg-blue-700 transition-all">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Card -->
+            <div id="interview-report" class="hidden glass p-8 rounded-3xl text-center space-y-8 animate-in zoom-in-90 duration-700">
+                <h2 class="text-2xl font-bold">Rapor Performa Interview</h2>
+                
+                <div class="flex justify-center space-x-4">
+                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10 w-32">
+                        <p class="text-xs text-slate-400 uppercase mb-1">Skor</p>
+                        <p id="report-grade" class="text-5xl font-black text-blue-400">A</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10 flex-1 text-left">
+                        <p class="text-xs text-slate-400 uppercase mb-1">Analisis Singkat</p>
+                        <p id="report-analysis" class="text-sm font-medium leading-relaxed">---</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-left">
+                    <h3 class="font-bold flex items-center">
+                        <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-yellow-400"></i> Tips Perbaikan:
+                    </h3>
+                    <ul id="report-tips" class="space-y-2 text-sm text-slate-400 list-disc list-inside">
+                        <!-- Tips -->
+                    </ul>
+                </div>
+
+                <button onclick="location.reload()" class="w-full glass hover:bg-white/10 py-4 rounded-2xl font-bold transition-all">
+                    Ulangi Simulasi
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadSavedData();
+            window.updatePreview();
+        });
+
+        // Global state for AI
+        const API_KEY = process.env.GEMINI_API_KEY;
+        let aiChat = null;
+        let currentStatus = "idle"; // idle, interviewing, evaluating
+
+        // UI Helpers
+        window.switchTab = (tab) => {
+            const viewCv = document.getElementById('view-cv');
+            const viewInterview = document.getElementById('view-interview');
+            const tabCv = document.getElementById('tab-cv');
+            const tabInterview = document.getElementById('tab-interview');
+
+            if (tab === 'cv') {
+                viewCv.classList.remove('hidden');
+                viewInterview.classList.add('hidden');
+                tabCv.classList.add('tab-active');
+                tabCv.classList.remove('text-slate-400');
+                tabInterview.classList.remove('tab-active');
+                tabInterview.classList.add('text-slate-400');
+            } else {
+                viewCv.classList.add('hidden');
+                viewInterview.classList.remove('hidden');
+                tabCv.classList.remove('tab-active');
+                tabCv.classList.add('text-slate-400');
+                tabInterview.classList.add('tab-active');
+                tabInterview.classList.remove('text-slate-400');
+                
+                const pos = document.getElementById('input-position').value || "Professional";
+                document.getElementById('interview-target-pos').textContent = pos;
+            }
+        };
+
+        // CV Management
+        const inputs = [
+            'input-name', 'input-age', 'input-position', 
+            'input-email', 'input-phone', 'input-address',
+            'input-education', 'input-edu-year',
+            'input-experience', 'input-skills'
+        ];
+        
+        window.updatePreview = () => {
+            const getVal = (id, def) => document.getElementById(id).value || def;
+
+            document.getElementById('pv-name').textContent = getVal('input-name', "Nama Anda");
+            document.getElementById('pv-position').textContent = getVal('input-position', "POSISI TARGET");
+            document.getElementById('pv-age-display').textContent = `Umur: ${getVal('input-age', '--')} Tahun`;
+            document.getElementById('pv-address-display').textContent = `Domisili: ${getVal('input-address', '--')}`;
+            
+            document.getElementById('pv-email').textContent = getVal('input-email', "email@anda.com");
+            document.getElementById('pv-phone').textContent = getVal('input-phone', "0812-xxxx");
+            
+            document.getElementById('pv-education').textContent = getVal('input-education', "Nama Sekolah/Univ");
+            document.getElementById('pv-edu-year').textContent = `Lulusan Tahun ${getVal('input-edu-year', '----')}`;
+            
+            document.getElementById('pv-experience').textContent = getVal('input-experience', "Detail pengalaman akan muncul di sini...");
+
+            const skills = getVal('input-skills', "JavaScript, Design, Management");
+            const skillContainer = document.getElementById('pv-skills');
+            skillContainer.innerHTML = '';
+            skills.split(',').forEach(s => {
+                if (s.trim()) {
+                    const span = document.createElement('span');
+                    span.className = "bg-slate-100 text-slate-700 text-[8px] px-1.5 py-0.5 rounded font-bold uppercase border border-slate-200";
+                    span.textContent = s.trim();
+                    skillContainer.appendChild(span);
+                }
+            });
+            
+            lucide.createIcons();
+        };
+
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('input', window.updatePreview);
+        });
+
+        window.saveData = () => {
+            const data = {};
+            inputs.forEach(id => {
+                data[id.replace('input-', '')] = document.getElementById(id).value;
+            });
+            localStorage.setItem('intervibe_cv_data', JSON.stringify(data));
+            alert('Data CV berhasil disimpan.');
+        };
+
+        function loadSavedData() {
+            const saved = localStorage.getItem('intervibe_cv_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                inputs.forEach(id => {
+                    const key = id.replace('input-', '');
+                    if (data[key]) {
+                        const el = document.getElementById(id);
+                        if(el) el.value = data[key];
+                    }
+                });
+                window.updatePreview();
+            }
+        }
+
+        // --- INTERVIEW AI SYSTEM ---
+        let questionCount = 0;
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        window.startInterview = async () => {
+            if (!API_KEY) {
+                alert("API Key Gemini tidak ditemukan. Pastikan sudah dikonfigurasi.");
+                return;
+            }
+
+            const data = {
+                name: document.getElementById('input-name').value || "Kandidat",
+                age: document.getElementById('input-age').value || "20-an",
+                pos: document.getElementById('input-position').value || "Professional",
+                edu: document.getElementById('input-education').value || "Umum",
+                exp: document.getElementById('input-experience').value || "N/A",
+                skills: document.getElementById('input-skills').value || "N/A"
+            };
+
+            document.getElementById('interview-welcome').classList.add('hidden');
+            document.getElementById('interview-chat').classList.remove('hidden');
+            
+            const systemPrompt = `Kamu adalah HRD Virtual yang ramah dan profesional bernama "VibeHR". 
+            Tugasmu adalah melakukan interview simulasi yang mudah dipahami (untuk semua jurusan) dalam Bahasa Indonesia.
+            
+            KONTEKS KANDIDAT:
+            - Nama: ${data.name}
+            - Umur: ${data.age} tahun
+            - Melamar Posisi: ${data.pos}
+            - Pendidikan Terakhir: ${data.edu}
+            - Pengalaman: ${data.exp}
+            - Keahlian: ${data.skills}
+            
+            ATURAN MAIN:
+            1. Sapa kandidat dengan ramah sesuai konteks CV di atas.
+            2. Ajukan total 3 pertanyaan bergantian. Satu pertanyaan saja setiap kali membalas.
+            3. Berikan respon singkat/apresiasi pada jawaban kandidat sebelum lanjut ke pertanyaan berikutnya.
+            4. Gunakan bahasa yang santai tapi tetap profesional (Gaya HRD Startup Modern).
+            5. Setelah kandidat menjawab pertanyaan ke-3, katakan bahwa data sedang dianalisis dan interview selesai.
+            6. JANGAN memberikan evaluasi sekarang. Hanya lakukan tanya jawab.`;
+
+            aiChat = model.startChat({
+                history: [
+                    { role: "user", parts: [{ text: systemPrompt }] },
+                    { role: "model", parts: [{ text: "Siap, saya akan memulai interview sebagai VibeHR." }] }
+                ]
+            });
+
+            currentStatus = "interviewing";
+            questionCount = 1;
+            triggerBotResponse("Mulai");
+        };
+
+        async function triggerBotResponse(userMsg) {
+            const typingIndicator = document.getElementById('chat-typing');
+            typingIndicator.classList.remove('hidden');
+            
+            try {
+                const result = await aiChat.sendMessage(userMsg);
+                const botText = result.response.text();
+                
+                typingIndicator.classList.add('hidden');
+                appendMessage('bot', botText);
+                
+                if (questionCount > 3) {
+                    setTimeout(generateAIReport, 3000);
+                }
+            } catch (error) {
+                console.error(error);
+                appendMessage('bot', "Maaf, sistem AI mengalami kendala sejenak. Silakan coba lagi.");
+                typingIndicator.classList.add('hidden');
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const chatMessages = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            
+            if (sender === 'bot') {
+                div.className = "flex justify-start animate-in slide-in-from-left-2 duration-300";
+                div.innerHTML = `
+                    <div class="bg-slate-800 rounded-2xl rounded-tl-none p-4 max-w-[85%] border border-white/5">
+                        <p class="text-sm leading-relaxed">${text}</p>
+                    </div>
+                `;
+            } else {
+                div.className = "flex justify-end animate-in slide-in-from-right-2 duration-300";
+                div.innerHTML = `
+                    <div class="bg-blue-600 rounded-2xl rounded-tr-none p-4 max-w-[85%] neo-glow">
+                        <p class="text-sm leading-relaxed">${text}</p>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        window.handleKeyPress = (e) => {
+            if (e.key === 'Enter') window.sendResponse();
+        };
+
+        window.sendResponse = () => {
+            const input = document.getElementById('user-response');
+            const text = input.value.trim();
+            
+            if (!text || currentStatus !== "interviewing") return;
+
+            appendMessage('user', text);
+            input.value = '';
+            questionCount++;
+
+            triggerBotResponse(text);
+        };
+
+        async function generateAIReport() {
+            document.getElementById('interview-chat').classList.add('hidden');
+            document.getElementById('interview-report').classList.remove('hidden');
+            
+            const reportAnalysisField = document.getElementById('report-analysis');
+            reportAnalysisField.innerHTML = '<div class="flex items-center"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div> <span class="ml-2">AI sedang menganalisis performa Anda...</span></div>';
+
+            try {
+                const evalPrompt = `Keluarkan EVALUASI AKHIR interview dalam format JSON MURNI (tanpa markdown box). 
+                Format: { "grade": "A/B/C/D", "analysis": "kalimat singkat analisis", "tips": ["tip1", "tip2", "tip3"] }.
+                Berikan skor berdasarkan kualitas jawaban kandidat tadi. Jika jawaban terlalu pendek, beri skor rendah. Jika informatif, beri skor tinggi.`;
+                
+                const result = await aiChat.sendMessage(evalPrompt);
+                let responseText = result.response.text();
+                
+                // Clean markdown artifacts if any
+                responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                
+                const evaluation = JSON.parse(responseText);
+
+                document.getElementById('report-grade').textContent = evaluation.grade;
+                reportAnalysisField.textContent = evaluation.analysis;
+                
+                const tipsList = document.getElementById('report-tips');
+                tipsList.innerHTML = '';
+                evaluation.tips.forEach(t => {
+                    const li = document.createElement('li');
+                    li.textContent = t;
+                    tipsList.appendChild(li);
+                });
+
+                if (evaluation.grade === 'A' || evaluation.grade === 'B') {
+                    document.getElementById('report-grade').classList.add('neon-text-blue');
+                }
+            } catch (error) {
+                console.error(error);
+                reportAnalysisField.textContent = "Gagal memuat analisis AI. Namun Anda telah menyelesaikan simulasi dengan baik!";
+            }
+        }
+    </script>
+</body>
+</html>
